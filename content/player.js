@@ -52,6 +52,7 @@
     if (!p) return;
     p.style.setProperty("--htz-scale", String(settings.subScale || 1));
     p.style.setProperty("--htz-bottom", String(settings.subBottom ?? 8));
+    p.classList.toggle("htz-style-box", settings.subStyle === "box");
     // our lines include the English, so YouTube's own captions would only duplicate them
     p.classList.toggle("htz-hide-native", settings.subMode !== "off" && sentences.length > 0);
   }

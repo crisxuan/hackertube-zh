@@ -11,10 +11,20 @@
 /* lift above the control bar while it is visible */
 #movie_player:not(.ytp-autohide) .htz-sub { bottom: calc(var(--htz-bottom, 8) * 1% + 52px); }
 
+/* Default: outlined text with no box, so the picture isn't covered. The layered shadows make a soft dark outline
+   that keeps white text readable on bright frames and slides. */
 .htz-line {
-  display: inline-block; max-width: 100%; padding: .08em .45em; border-radius: 4px;
-  background: rgba(8, 8, 8, .72); color: #fff; line-height: 1.38; white-space: pre-wrap;
+  display: inline-block; max-width: 100%; padding: 0 .2em; color: #fff; line-height: 1.38; white-space: pre-wrap;
   font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", Roboto, Arial, sans-serif;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, .95), 0 0 2px rgba(0, 0, 0, .9),
+    1px 1px 1px rgba(0, 0, 0, .85), -1px -1px 1px rgba(0, 0, 0, .85),
+    1px -1px 1px rgba(0, 0, 0, .85), -1px 1px 1px rgba(0, 0, 0, .85),
+    0 2px 6px rgba(0, 0, 0, .55);
+}
+/* Optional: a compact translucent box, for videos with lots of white slides */
+.htz-style-box .htz-line {
+  padding: .06em .4em; border-radius: 6px; background: rgba(0, 0, 0, .55); text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
 }
 .htz-line:empty { display: none; }
 .htz-zh { font-size: max(15px, calc(var(--htz-h, 360px) * .05 * var(--htz-scale, 1))); font-weight: 500; }
