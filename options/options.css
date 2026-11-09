@@ -1,0 +1,30 @@
+body { background: var(--bg2); }
+main { max-width: 720px; margin: 0 auto; padding: 32px 16px 48px; }
+header { display: flex; gap: 14px; align-items: center; margin-bottom: 20px; }
+header h1 { font-size: 20px; }
+header .hint { margin: 2px 0 0; }
+.card { background: var(--bg); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.card h2 { font-size: 15px; color: var(--text); font-weight: 600; margin-bottom: 14px; }
+.field { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.field > span:first-child { width: 88px; flex: none; color: var(--muted); }
+.field .seg { flex: 1; max-width: 360px; }
+.field input[type=range] { flex: 1; max-width: 300px; accent-color: var(--accent); }
+.field output { width: 44px; }
+.field.check { align-items: flex-start; }
+.field.check span { width: auto; color: var(--text); }
+.field.check .hint.block { display: block; margin-top: 4px; color: var(--muted); }
+.engines { display: grid; gap: 8px; margin-bottom: 14px; }
+.engine { display: grid; grid-template-columns: 20px 1fr; column-gap: 8px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.engine:has(input:checked) { border-color: var(--accent); }
+.engine input { grid-row: span 2; margin-top: 3px; accent-color: var(--accent); }
+.engine span { color: var(--muted); font-size: 13px; }
+.cfg { display: none; padding: 12px; background: var(--bg2); border-radius: 8px; margin-bottom: 14px; }
+.cfg.on { display: block; }
+.cfg label { display: block; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
+.cfg label input, .cfg label select { margin-top: 4px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#msg, #cacheMsg { font-size: 13px; }
+code { background: var(--bg2); padding: 1px 4px; border-radius: 4px; font-size: 12px; }
+@media (max-width: 560px) { .two { grid-template-columns: 1fr; } .field:not(.check) { flex-wrap: wrap; } }

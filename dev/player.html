@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Subtitle harness</title>
+<link rel="stylesheet" href="/ext/content/player.css">
+<style>
+  body { margin: 16px; font: 14px/1.5 -apple-system, "PingFang SC", sans-serif; background: #f2f2f2; }
+  /* stand-in for YouTube's player element: same id and classes the scripts look for */
+  #movie_player { position: relative; width: 854px; max-width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+  #movie_player video { width: 100%; height: 100%; display: block; }
+  .ytp-caption-window-container { position: absolute; left: 0; right: 0; bottom: 20px; text-align: center; color: #ff0; font-size: 20px; }
+  .bar { margin: 12px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div id="movie_player" class="html5-video-player ytp-autohide">
+    <video class="html5-main-video" src="/media/test.mp4" muted playsinline></video>
+    <div class="ytp-caption-window-container">YouTube 原生字幕（启用中文字幕后应被隐藏）</div>
+  </div>
+  <div class="bar">
+    <button id="asr">发送自动生成字幕（ASR）</button>
+    <button id="manual">发送人工字幕</button>
+    <button id="play">播放</button>
+    <button id="controls">切换控制栏显示</button>
+  </div>
+  <p>这个页面模拟 HackerTube 里的 YouTube 嵌入播放器：按钮把字幕文件按 player-main.js 的消息格式发给 player.js。</p>
+
+  <script>window.HTZ_ALLOW_ANY_HOST = true;</script>
+  <script src="/ext/dev/chrome-shim.js"></script>
+  <script type="module">
+    await import("/ext/background.js");
+    const load = (src) => new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.append(s); });
+    for (const f of ["lib/subtitles.js", "lib/runtime.js", "content/player.js"]) await load(`/ext/${f}`);
+
+    // Original sample speech, timed like a real track. The ASR version has no punctuation or capitals,
+    // which is what YouTube's auto-generated captions usually look like.
+    const SPEECH = [
+      "Welcome everyone, thanks for coming to this talk about netcode.",
+      "When you play an online game, every player sees a slightly different version of the world.",
+      "The server is the source of truth, but it is always a little bit in the past for you.",
+      "So the client predicts what will happen next and corrects itself when the server disagrees.",
+      "Done well, you never notice any of this.",
+      "Done badly, you get rubber banding, missed shots and a lot of angry forum posts.",
+      "In the next few minutes I want to show you how we built a deterministic simulation that makes this manageable.",
+    ];
+    function asrTrack() {
+      const events = []; let t = 500;
+      for (const sentence of SPEECH) {
+        const words = sentence.toLowerCase().replace(/[.,]/g, "").split(" ");
+        for (let i = 0; i < words.length; i += 6) {
+          const chunk = words.slice(i, i + 6);
+          events.push({ tStartMs: t, dDurationMs: chunk.length * 320, wWinId: 1,
+            segs: chunk.map((w, j) => (j ? { utf8: " " + w, tOffsetMs: j * 320 } : { utf8: w, acAsrConf: 0 })) });
+          t += chunk.length * 320;
+        }
+        t += 900; // breath between sentences
+      }
+      return JSON.stringify({ events });
+    }
+    function manualTrack() {
+      const events = []; let t = 500;
+      for (const sentence of SPEECH) {
+        // split each sentence into display lines of ~7 words, like an uploader's caption file
+        const words = sentence.split(" ");
+        for (let i = 0; i < words.length; i += 7) {
+          const line = words.slice(i, i + 7).join(" ");
+          events.push({ tStartMs: t, dDurationMs: line.length * 55, segs: [{ utf8: line }] });
+          t += line.length * 55;
+        }
+        t += 400;
+      }
+      return JSON.stringify({ events });
+    }
+    const send = (body, kind) => window.postMessage({ source: "htz-main", type: "captions", vid: "harness", title: "Game Networking in Practice", kind, body }, "*");
+    document.getElementById("asr").onclick = () => send(asrTrack(), "asr");
+    document.getElementById("manual").onclick = () => send(manualTrack(), "");
+    document.getElementById("play").onclick = () => document.querySelector("video").play();
+    document.getElementById("controls").onclick = () => document.getElementById("movie_player").classList.toggle("ytp-autohide");
+    window.postMessage({ source: "htz-main", type: "video", vid: "harness", title: "Game Networking in Practice" }, "*");
+    window.__harness = { send, asrTrack, manualTrack };
+  </script>
+</body>
+</html>

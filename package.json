@@ -1,0 +1,42 @@
+{
+  "name": "hackertube-zh",
+  "version": "0.1.1",
+  "description": "HackerTube 中文助手 Chrome 扩展：双语界面、标题评论翻译、实时中文字幕。npx hackertube-zh 一行安装。",
+  "keywords": ["hackertube", "chrome-extension", "translation", "subtitles", "chinese"],
+  "author": "crisxuan",
+  "license": "MIT",
+  "homepage": "https://github.com/crisxuan/hackertube-zh#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crisxuan/hackertube-zh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crisxuan/hackertube-zh/issues"
+  },
+  "bin": {
+    "hackertube-zh": "bin/install.js"
+  },
+  "files": [
+    "bin",
+    "manifest.json",
+    "background.js",
+    "lib",
+    "content",
+    "popup",
+    "options",
+    "ui",
+    "icons"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "check": "node scripts/check.js",
+    "icons": "node scripts/render-icons.js",
+    "zip": "node scripts/check.js && rm -f dist/hackertube-zh.zip && mkdir -p dist && zip -r dist/hackertube-zh.zip manifest.json background.js lib content popup options ui icons"
+  }
+}

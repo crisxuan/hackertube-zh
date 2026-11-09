@@ -1,0 +1,41 @@
+:root {
+  --bg: #ffffff; --bg2: #f2f2f2; --text: #0f0f0f; --muted: #606060; --line: #e5e5e5;
+  --accent: #ff6600; --on: #0f0f0f; --on-text: #ffffff; --err: #c62828; --ok: #2e7d32;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818; --bg2: #272727; --text: #f1f1f1; --muted: #aaaaaa; --line: #333333;
+    --on: #f1f1f1; --on-text: #0f0f0f; --err: #ef5350; --ok: #66bb6a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+h1 { font-size: 16px; margin: 0; font-weight: 600; }
+h2 { font-size: 13px; margin: 0 0 8px; color: var(--muted); font-weight: 500; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.seg { display: flex; background: var(--bg2); border-radius: 8px; padding: 3px; gap: 3px; }
+.seg button {
+  flex: 1; border: 0; background: transparent; color: var(--text); padding: 6px 4px; border-radius: 6px;
+  font: inherit; cursor: pointer;
+}
+.seg button:hover { background: rgba(127,127,127,.15); }
+.seg button.on { background: var(--on); color: var(--on-text); }
+
+select, input[type=text], input[type=password], input[type=url] {
+  width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--text); font: inherit;
+}
+button.primary, button.plain {
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 14px; font: inherit; cursor: pointer;
+  background: var(--bg2); color: var(--text);
+}
+button.primary { background: var(--on); color: var(--on-text); border-color: var(--on); }
+.hint { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+.err { color: var(--err); }
+.ok { color: var(--ok); }

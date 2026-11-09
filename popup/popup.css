@@ -1,0 +1,9 @@
+body { width: 320px; padding: 14px 16px 12px; }
+header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+section { margin-bottom: 14px; }
+.row { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 13px; }
+.row input { flex: 1; accent-color: var(--accent); }
+.row output { width: 34px; text-align: right; color: var(--text); }
+.toggle { display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); margin: 0; }
+footer { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 10px; font-size: 13px; }

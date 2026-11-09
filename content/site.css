@@ -1,0 +1,31 @@
+/* Bilingual: the original and its translation sit together as one pair, then the site's usual spacing. */
+html[data-htz-mode="bilingual"] .htz-src { margin-bottom: 2px !important; }
+html[data-htz-mode="bilingual"] .htz-tr { margin-top: 0 !important; }
+html[data-htz-mode="bilingual"] .htz-tr.vt,
+html[data-htz-mode="bilingual"] h1.htz-tr { opacity: .92; }
+
+/* Chinese only: hide the original, the translated copy already carries the original's classes */
+html[data-htz-mode="zh"] .htz-src { display: none !important; }
+
+.htz-pair { min-width: 0; }
+.htz-inline { margin-left: .4em; opacity: .75; }
+
+#htz-status {
+  position: fixed; right: 16px; bottom: 16px; z-index: 2147483000;
+  max-width: min(420px, calc(100vw - 32px)); padding: 6px 12px; border-radius: 999px;
+  background: var(--chip-on, #0f0f0f); color: var(--chip-on-text, #fff);
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  box-shadow: 0 2px 10px rgba(0,0,0,.2); pointer-events: none;
+  opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
+}
+#htz-status.on { opacity: .92; transform: none; }
+#htz-status.err { background: #c62828; color: #fff; border-radius: 12px; }
+
+#htz-toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 2147483000; transform: translate(-50%, 8px);
+  max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 8px;
+  background: var(--chip-on, #0f0f0f); color: var(--chip-on-text, #fff);
+  font: 14px/1.4 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+#htz-toast.on { opacity: 1; transform: translate(-50%, 0); }

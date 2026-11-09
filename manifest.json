@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "HackerTube 中文助手",
+  "short_name": "HackerTube 中文",
+  "version": "0.1.1",
+  "homepage_url": "https://github.com/crisxuan/hackertube-zh",
+  "description": "为 HackerTube 提供实时中文：双语界面，视频标题、简介和 HN 评论翻译，以及嵌入视频的实时中英双语字幕。",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage", "unlimitedStorage", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": [
+    "https://hackertube.org/*",
+    "https://www.hackertube.org/*",
+    "https://www.youtube-nocookie.com/*",
+    "https://translate.googleapis.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.openai.com/*"
+  ],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://hackertube.org/*", "https://www.hackertube.org/*"],
+      "js": ["lib/textutil.js", "lib/uidict.js", "lib/runtime.js", "content/site.js"],
+      "css": ["content/site.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.youtube-nocookie.com/embed/*", "https://www.youtube.com/embed/*"],
+      "js": ["content/player-main.js"],
+      "world": "MAIN",
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.youtube-nocookie.com/embed/*", "https://www.youtube.com/embed/*"],
+      "js": ["lib/subtitles.js", "lib/runtime.js", "content/player.js"],
+      "css": ["content/player.css"],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "HackerTube 中文助手",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_page": "options/options.html"
+}

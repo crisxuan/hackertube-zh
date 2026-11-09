@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>HackerTube 中文助手 · 设置</title>
+<link rel="stylesheet" href="../ui/common.css">
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<main>
+  <header>
+    <img src="../icons/icon128.png" alt="" width="40" height="40">
+    <div>
+      <h1>HackerTube 中文助手</h1>
+      <p class="hint">为 hackertube.org 提供双语界面、标题/简介/评论翻译和实时中文字幕。</p>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>显示</h2>
+    <div class="field">
+      <span>网页翻译</span>
+      <div class="seg" data-key="pageMode">
+        <button value="bilingual">双语对照</button><button value="zh">仅中文</button><button value="off">关闭</button>
+      </div>
+    </div>
+    <div class="field">
+      <span>视频字幕</span>
+      <div class="seg" data-key="subMode">
+        <button value="bilingual">中英双语</button><button value="zh">仅中文</button><button value="off">关闭</button>
+      </div>
+    </div>
+    <label class="field"><span>字幕大小</span>
+      <input type="range" id="subScale" min="0.7" max="1.8" step="0.1"><output id="subScaleOut"></output></label>
+    <label class="field"><span>字幕离底部</span>
+      <input type="range" id="subBottom" min="2" max="30" step="1"><output id="subBottomOut"></output></label>
+    <label class="field check"><input type="checkbox" id="searchTranslate">
+      <span>搜索框输入中文时，先翻译成英文再搜索（HackerTube 的搜索只理解英文）</span></label>
+  </section>
+
+  <section class="card">
+    <h2>播放</h2>
+    <label class="field check"><input type="checkbox" id="embedLogin">
+      <span>用我的 YouTube 登录状态播放
+        <span class="hint block">HackerTube 用 youtube-nocookie.com 嵌入视频，这个域名读不到你的 YouTube 登录，网络环境被 YouTube 怀疑时（常见于代理 / VPN 节点）就会一直提示 “Sign in to confirm you're not a bot”。
+          打开后，HackerTube 里的视频改由 youtube.com 播放，能用上你已登录的账号，中文字幕照常显示。
+          代价：观看会计入你的 YouTube 历史记录。需要 Chrome 允许第三方 Cookie（无痕窗口默认不允许）。开启后刷新视频页生效。</span></span></label>
+  </section>
+
+  <section class="card">
+    <h2>翻译引擎</h2>
+    <div class="engines">
+      <label class="engine"><input type="radio" name="engine" value="google">
+        <b>Google 翻译</b><span>免费、无需配置、速度快。需要能访问 translate.googleapis.com。</span></label>
+      <label class="engine"><input type="radio" name="engine" value="claude">
+        <b>Claude</b><span>理解上下文，字幕和评论翻得更自然。按 Anthropic API 用量计费。</span></label>
+      <label class="engine"><input type="radio" name="engine" value="openai">
+        <b>OpenAI 兼容接口</b><span>OpenAI、DeepSeek、通义千问、Moonshot、本地 Ollama 等任何 /chat/completions 接口。</span></label>
+    </div>
+
+    <div class="cfg" data-for="claude">
+      <label>Claude API Key<input type="password" id="claudeKey" placeholder="sk-ant-…" autocomplete="off"></label>
+      <div class="two">
+        <label>模型<input type="text" id="claudeModel" list="claudeModels"></label>
+        <label>思考力度（effort）
+          <select id="claudeEffort">
+            <option value="low">low（推荐，翻译够用且最快）</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+            <option value="">模型默认</option>
+          </select></label>
+      </div>
+      <datalist id="claudeModels">
+        <option value="claude-opus-5-5"><option value="claude-sonnet-5-5"><option value="claude-haiku-5-5">
+      </datalist>
+      <p class="hint">Key 只保存在本机（chrome.storage.local），不会同步，也只发送给 api.anthropic.com。</p>
+    </div>
+
+    <div class="cfg" data-for="openai">
+      <label>接口地址（Base URL）<input type="url" id="openaiBaseUrl" placeholder="https://api.openai.com/v1"></label>
+      <div class="two">
+        <label>模型<input type="text" id="openaiModel" placeholder="例如 deepseek-chat"></label>
+        <label>API Key<input type="password" id="openaiKey" placeholder="本地 Ollama 可留空" autocomplete="off"></label>
+      </div>
+      <p class="hint">示例：DeepSeek <code>https://api.deepseek.com/v1</code> + <code>deepseek-chat</code>；
+        Ollama <code>http://localhost:11434/v1</code> + 本地模型名。保存时浏览器会请求访问该地址的权限。</p>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="save">保存</button>
+      <button class="plain" id="test">测试当前引擎</button>
+      <span id="msg"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>缓存</h2>
+    <p>已缓存 <b id="cacheCount">…</b> 条译文。看过的视频和页面再次打开时直接使用缓存，不再请求翻译。</p>
+    <div class="actions"><button class="plain" id="clearCache">清空缓存</button><span id="cacheMsg"></span></div>
+  </section>
+</main>
+<script src="../lib/runtime.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

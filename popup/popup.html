@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>HackerTube 中文助手</title>
+<link rel="stylesheet" href="../ui/common.css">
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="../icons/icon48.png" alt="" width="24" height="24">
+    <h1>HackerTube 中文助手</h1>
+  </header>
+
+  <section>
+    <h2>网页翻译</h2>
+    <div class="seg" data-key="pageMode">
+      <button value="bilingual">双语对照</button><button value="zh">仅中文</button><button value="off">关闭</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>视频字幕</h2>
+    <div class="seg" data-key="subMode">
+      <button value="bilingual">中英双语</button><button value="zh">仅中文</button><button value="off">关闭</button>
+    </div>
+    <label class="row">字幕大小
+      <input type="range" id="subScale" min="0.7" max="1.8" step="0.1">
+      <output id="subScaleOut"></output>
+    </label>
+    <label class="toggle"><input type="checkbox" id="embedLogin"><span>用我的 YouTube 登录状态播放</span></label>
+    <p class="hint">播放器提示 “Sign in to confirm you're not a bot” 时打开。观看会计入你的 YouTube 历史记录，开启后刷新视频页生效。</p>
+  </section>
+
+  <section>
+    <h2>翻译引擎</h2>
+    <select id="engine">
+      <option value="google">Google 翻译（免费，无需配置）</option>
+      <option value="claude">Claude（需 API Key）</option>
+      <option value="openai">OpenAI 兼容接口（DeepSeek / 通义 / Ollama…）</option>
+    </select>
+    <p class="hint" id="engineHint"></p>
+  </section>
+
+  <footer>
+    <a href="#" id="openOptions">更多设置</a>
+    <a href="https://hackertube.org" target="_blank" rel="noopener">打开 HackerTube</a>
+  </footer>
+  <script src="../lib/runtime.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

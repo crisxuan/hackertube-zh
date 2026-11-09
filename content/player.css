@@ -1,0 +1,32 @@
+/* Subtitles drawn inside YouTube's player element, so they follow it into fullscreen. Sizes scale with the
+   player's height (--htz-h, set by a ResizeObserver) like YouTube's own captions do. */
+.htz-sub {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--htz-bottom, 8) * 1%);
+  width: 92%; z-index: 38; pointer-events: none;
+  display: none; flex-direction: column; align-items: center; gap: .15em;
+  text-align: center; transition: bottom .2s ease;
+}
+.htz-sub.on { display: flex; }
+/* lift above the control bar while it is visible */
+#movie_player:not(.ytp-autohide) .htz-sub { bottom: calc(var(--htz-bottom, 8) * 1% + 52px); }
+
+.htz-line {
+  display: inline-block; max-width: 100%; padding: .08em .45em; border-radius: 4px;
+  background: rgba(8, 8, 8, .72); color: #fff; line-height: 1.38; white-space: pre-wrap;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", Roboto, Arial, sans-serif;
+}
+.htz-line:empty { display: none; }
+.htz-zh { font-size: max(15px, calc(var(--htz-h, 360px) * .05 * var(--htz-scale, 1))); font-weight: 500; }
+.htz-en { font-size: max(12px, calc(var(--htz-h, 360px) * .036 * var(--htz-scale, 1))); color: #e8e8e8; }
+
+.htz-hide-native .ytp-caption-window-container { display: none !important; }
+
+.htz-badge {
+  position: absolute; top: 12px; left: 12px; z-index: 61; pointer-events: none;
+  padding: 4px 10px; border-radius: 999px; background: rgba(8, 8, 8, .75); color: #fff;
+  font: 500 13px/1.4 "PingFang SC", "Microsoft YaHei", Roboto, Arial, sans-serif;
+  opacity: 0; transition: opacity .25s;
+}
+.htz-badge.on { opacity: 1; }
+.htz-badge.err { background: rgba(198, 40, 40, .9); }
