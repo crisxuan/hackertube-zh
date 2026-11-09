@@ -1,6 +1,9 @@
-<p align="center"><img src="icons/icon.svg" width="112" alt="HackerTube 中文助手"></p>
-
-<h1 align="center">HackerTube 中文助手</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.png">
+    <img src="docs/logo-light.png" width="470" alt="HackerTube 中文插件">
+  </picture>
+</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/hackertube-zh"><img src="https://img.shields.io/npm/v/hackertube-zh?color=ff6600" alt="npm"></a>
@@ -118,7 +121,7 @@ hackertube.org 页面                         YouTube 嵌入播放器（iframe, 
 ```bash
 npm test          # 单元测试：字幕解析与分句、引擎请求/响应、界面词典
 npm run check     # 静态检查：manifest 引用的文件都存在、所有 JS 语法正确
-npm run icons     # 从 icons/icon.svg、icon-small.svg 渲染 PNG 图标（用本机 Chrome 的无头模式）
+npm run icons     # 从 icons/*.svg 渲染插件图标 PNG 和 README 横版 logo（用本机 Chrome 的无头模式）
 npm run zip       # 打包到 dist/hackertube-zh.zip（上架 Chrome 应用商店用）
 ```
 
@@ -152,7 +155,8 @@ bin/install.js         npx 安装器
 dev/                   本地调试服务器和模拟页面
 tests/                 node:test 单元测试
 scripts/               静态检查、图标渲染
-icons/                 图标：icon.svg（大图）、icon-small.svg（16/32px 简化版）及渲染出的 PNG
+icons/                 插件图标：icon.svg（48/128px）、icon-small.svg（16/32px 简化版）及渲染出的 PNG
+docs/                  README 横版 logo（浅色 / 深色两版，由 npm run icons 生成）
 ```
 
 ## 参与贡献

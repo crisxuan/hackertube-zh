@@ -1,28 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- HackerTube 中文助手: a dark screen showing 中 above two subtitle lines (Chinese + English).
-       Used for the 48 and 128 px icons; icon-small.svg is the simplified art for 16 and 32 px. -->
+  <!-- HackerTube 中文插件: a video play button with a browser-extension puzzle piece, kept apart by a transparent
+       gap. Used for the 48 and 128 px icons and the README wordmark; icon-small.svg is the 16 / 32 px art. -->
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#303030"/>
-      <stop offset="1" stop-color="#121212"/>
+    <linearGradient id="play" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF6A33"/>
+      <stop offset="1" stop-color="#FC4C1B"/>
     </linearGradient>
-    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity=".16"/>
-      <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+    <linearGradient id="piece" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF961F"/>
+      <stop offset="1" stop-color="#FF7E14"/>
     </linearGradient>
-    <!-- user-space units: a bounding-box gradient would vanish on the zero-width vertical stroke -->
-    <linearGradient id="ink" gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="0" y2="89">
-      <stop offset="0" stop-color="#FF9440"/>
-      <stop offset="1" stop-color="#FF5A00"/>
-    </linearGradient>
+    <!-- the puzzle piece's footprint, grown by the gap, is cut out of the play button -->
+    <mask id="gap">
+      <rect width="128" height="128" fill="#fff"/>
+      <g fill="#000" stroke="#000" stroke-width="9" stroke-linejoin="round">
+        <rect x="75.5" y="71" width="44.5" height="40" rx="5"/>
+        <circle cx="99" cy="63.5" r="9.6"/>
+      </g>
+    </mask>
+    <!-- the socket on the piece's left side -->
+    <mask id="socket">
+      <rect width="128" height="128" fill="#fff"/>
+      <circle cx="76.5" cy="91" r="6.4" fill="#000"/>
+    </mask>
   </defs>
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#tile)"/>
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#sheen)"/>
-  <rect x="4.5" y="4.5" width="119" height="119" rx="27.5" fill="none" stroke="#fff" stroke-opacity=".14"/>
-  <g fill="none" stroke="url(#ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="27" y="38" width="74" height="32" rx="9"/>
-    <path d="M64 19V82"/>
+
+  <g mask="url(#gap)">
+    <rect x="8" y="17" width="106" height="83" rx="26" fill="url(#play)"/>
+    <path d="M49.5 43 L49.5 72 L76.5 57.5 Z" fill="#fff" stroke="#fff" stroke-width="9" stroke-linejoin="round"/>
   </g>
-  <rect x="30" y="96" width="68" height="9" rx="4.5" fill="#fff"/>
-  <rect x="44" y="110" width="40" height="6" rx="3" fill="#fff" fill-opacity=".45"/>
+
+  <g fill="url(#piece)" mask="url(#socket)">
+    <rect x="75.5" y="71" width="44.5" height="40" rx="5"/>
+    <circle cx="99" cy="63.5" r="9.6"/>
+    <rect x="94" y="64" width="10" height="9"/>
+  </g>
 </svg>
