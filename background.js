@@ -15,7 +15,8 @@ R.onSettings(syncEmbedLogin);
 const ENGINE_NAMES = { google: "Google 翻译", claude: "Claude", openai: "OpenAI 兼容接口" };
 const LIMITS = {
   google: { maxItems: 50, maxChars: 4500, concurrency: 4 },
-  llm: { maxItems: 40, maxChars: 6000, concurrency: 3 },
+  // small batches: a model has to finish the whole reply inside the engines' 25 s limit (see lib/engines.js)
+  llm: { maxItems: 12, maxChars: 1500, concurrency: 3 },
 };
 
 // ---------- small helpers ----------

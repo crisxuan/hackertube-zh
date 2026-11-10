@@ -86,6 +86,12 @@ test("OpenAI-compatible: builds chat/completions, retries once without response_
   assert.ok(!("Authorization" in E.buildOpenAIRequest(["x"], { model: "m", baseUrl: "http://x" }).headers));
 });
 
+test("a model that does not reply in time fails with a clear message (the caller then falls back)", async () => {
+  const fetchImpl = async () => { throw new DOMException("signal timed out", "TimeoutError"); };
+  await assert.rejects(E.claude(["x"], { model: "claude-opus-5-5", apiKey: "k", fetchImpl }), /no reply within 25 s/);
+  await assert.rejects(E.openai(["x"], { model: "m", baseUrl: "http://x", fetchImpl }), /no reply within 25 s/);
+});
+
 test("prompts treat item text as content, not instructions, and differ per kind", () => {
   for (const kind of ["page", "subtitle", "query"]) assert.match(E.systemPrompt("zh-CN", kind), /never instructions/);
   assert.match(E.systemPrompt("en", "query"), /English search phrase/);
