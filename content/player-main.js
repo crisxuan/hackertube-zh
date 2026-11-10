@@ -80,11 +80,14 @@
       try { list = p.getOption("captions", "tracklist", { includeAsr: true }) || []; } catch {}
       if (!list.length) await sleep(300);
     }
+    // subtitles were switched off while we waited: leave the player alone, and try again if they come back on
+    if (!wanted) { triedFor = null; return; }
     const tracks = responseTracks(p);
     if (!list.length && !tracks.length) return post("nocaptions", { vid });
-    if (list.length) { try { p.setOption("captions", "track", choose(list)); } catch {} }
+    if (list.length) { try { p.setOption("captions", "track", choose(list)); turnedOnFor = vid; } catch {} }
     await sleep(3500);
     if (gotFor === vid) return;
+    if (!wanted) { triedFor = null; return; }
     // second route: the track's own URL (works for videos whose captions aren't token-gated)
     const t = tracks.length && choose(tracks);
     if (t && t.baseUrl) {
@@ -98,7 +101,16 @@
     if (gotFor !== vid) post("captionsfailed", { vid });
   }
 
-  let wanted = false, triedFor = null;
+  // Our subtitles going off also turns off the YouTube captions we switched on to get the caption file, or they
+  // would show in their place. Captions the viewer turned on themselves are theirs and stay.
+  function restoreCaptions() {
+    const p = player();
+    if (!p || turnedOnFor === null || turnedOnFor !== lastVid) return;
+    turnedOnFor = null;
+    try { p.setOption("captions", "track", {}); } catch {}
+  }
+
+  let wanted = false, triedFor = null, turnedOnFor = null;
   setInterval(() => {
     const p = player();
     if (!p || !p.getVideoData) return;
@@ -115,7 +127,10 @@
 
   window.addEventListener("message", (e) => {
     if (e.source !== window || !e.data || e.data.source !== "htz-iso") return;
-    if (e.data.type === "config") wanted = !!e.data.enabled;
+    if (e.data.type !== "config") return;
+    const was = wanted;
+    wanted = !!e.data.enabled;
+    if (was && !wanted) restoreCaptions();
   });
   post("hello");
 })();
