@@ -1,11 +1,12 @@
 // Service worker: the only place that talks to translation engines. Content scripts send batches of text;
-// results are cached (memory + chrome.storage.local) per engine, so revisiting a page or video is free and instant.
+// results are cached (lib/cache.js) per engine, so revisiting a page or video is free and instant.
 import "./lib/textutil.js";
 import "./lib/engines.js";
 import "./lib/runtime.js";
 import "./lib/embedlogin.js";
+import "./lib/cache.js";
 
-const { text: T, engines: E, runtime: R, embedlogin: EL } = globalThis.HTZ;
+const { text: T, engines: E, runtime: R, embedlogin: EL, cache: C } = globalThis.HTZ;
 
 // keep the embed redirect rule in step with the setting: on every service worker start, and on every change
 const syncEmbedLogin = (s) => EL.sync(!!s.embedLogin).catch((e) => console.warn("[HackerTube 中文] embed rule:", e));
@@ -34,13 +35,7 @@ function limiter(n) {
 const limits = { google: limiter(LIMITS.google.concurrency), llm: limiter(LIMITS.llm.concurrency) };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const MEM_MAX = 8000;
-const mem = new Map();
-function memSet(k, v) {
-  mem.delete(k);
-  mem.set(k, v);
-  if (mem.size > MEM_MAX) mem.delete(mem.keys().next().value);
-}
+const cache = C.create(chrome.storage.local);
 
 // The cache key includes everything that changes the output: engine, model, target language and, for LLMs,
 // the kind of text (subtitle prompts differ from page prompts).
@@ -97,16 +92,8 @@ async function translate({ texts, kind = "page", to = "zh-CN", context }) {
   if (texts.some((t) => typeof t !== "string")) throw new Error("texts must be strings");
   const [settings, secrets] = await Promise.all([R.loadSettings(), R.loadSecrets()]);
   const eid = engineId(settings, kind, to);
-  const keys = texts.map((t) => "c:" + T.hash(eid + "\u0001" + t));
-  const out = keys.map((k) => mem.get(k));
-
-  const missingKeys = keys.filter((k, i) => out[i] == null);
-  if (missingKeys.length) {
-    const stored = await chrome.storage.local.get(missingKeys);
-    keys.forEach((k, i) => {
-      if (out[i] == null && stored[k] != null) { out[i] = stored[k]; memSet(k, stored[k]); }
-    });
-  }
+  const ids = texts.map((t) => T.hash(eid + "\u0001" + t));
+  const out = await cache.get(ids);
 
   const todo = [];
   out.forEach((v, i) => { if (v == null) todo.push(i); });
@@ -120,16 +107,11 @@ async function translate({ texts, kind = "page", to = "zh-CN", context }) {
     const toStore = {};
     for (const i of todo) {
       out[i] = byText.get(texts[i]);
-      if (res.cache) { memSet(keys[i], out[i]); toStore[keys[i]] = out[i]; }
+      if (res.cache) toStore[ids[i]] = out[i];
     }
-    if (Object.keys(toStore).length) chrome.storage.local.set(toStore);
+    cache.put(toStore);
   }
   return { translations: out, warning };
-}
-
-async function cacheKeys() {
-  const all = await chrome.storage.local.get(null);
-  return Object.keys(all).filter((k) => k.startsWith("c:"));
 }
 
 async function testEngine() {
@@ -151,8 +133,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   switch (msg && msg.type) {
     case "translate": return reply(translate(msg));
     case "testEngine": return reply(testEngine());
-    case "cacheStats": return reply(cacheKeys().then((k) => ({ entries: k.length })));
-    case "clearCache": return reply(cacheKeys().then(async (k) => { mem.clear(); await chrome.storage.local.remove(k); return { removed: k.length }; }));
+    case "cacheStats": return reply(cache.count().then((entries) => ({ entries })));
+    case "clearCache": return reply(cache.clear().then((removed) => ({ removed })));
     default: return false;
   }
 });

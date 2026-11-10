@@ -20,7 +20,7 @@
 - **中文搜索**：在搜索框输入中文，会先翻译成英文再交给 HackerTube 的语义搜索（它只理解英文）。
 - **用 YouTube 登录状态播放**（可选）：解决嵌入播放器一直提示 “Sign in to confirm you're not a bot” 的问题，见下方“常见问题”。
 - **三种翻译引擎**：Google 翻译（免费，默认）、Claude、任意 OpenAI 兼容接口（DeepSeek、通义千问、Ollama 等）。LLM 出错时自动临时回退到 Google。
-- 所有译文缓存在本地，同一个视频、同一页再次打开不再请求翻译。
+- 所有译文缓存在本地，同一个视频、同一页再次打开不再请求翻译。缓存有上限，很久没用到的译文会自动清掉。
 - 翻译请求失败（断网、被限流）时会自动重试，网络恢复后页面和字幕会自己补上中文，不用刷新。
 
 ## 安装
@@ -145,6 +145,7 @@ manifest.json          扩展清单（MV3）
 background.js          Service Worker：翻译调度、并发限制、缓存、引擎回退
 lib/                   公共模块（浏览器和 node 测试共用）
   engines.js           Google / Claude / OpenAI 兼容引擎
+  cache.js             译文缓存（内存 + storage.local，分两代淘汰旧条目）
   embedlogin.js        “用 YouTube 登录状态播放”的重定向规则
   subtitles.js         json3 / srv3 / WebVTT 解析与分句
   uidict.js            HackerTube 界面词典
