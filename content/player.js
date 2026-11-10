@@ -16,8 +16,9 @@
 
   let settings = { ...R.DEFAULTS };
   let vid = null, title = "";
-  let sentences = [], zh = [], st = []; // st: 0 = not sent, 1 = in flight, 2 = done, 3 = gave up
+  let sentences = [], zh = [], st = []; // st: 0 = not sent, 1 = in flight, 2 = done
   let gen = 0, inflight = 0, failures = 0, doneCount = 0;
+  let retryAt = 0; // after a failed request nothing is sent before this time
 
   const post = (type, data = {}) => window.postMessage({ source: "htz-iso", type, ...data }, "*");
   const sendConfig = () => post("config", { enabled: settings.subMode !== "off" });
@@ -102,7 +103,7 @@
   }
 
   function pump() {
-    if (settings.subMode === "off" || !sentences.length) return;
+    if (settings.subMode === "off" || !sentences.length || Date.now() < retryAt) return;
     const v = video();
     const now = v ? v.currentTime * 1000 : 0;
     while (inflight < MAX_INFLIGHT) {
@@ -128,10 +129,12 @@
         .catch((err) => {
           if (myGen !== gen) return;
           failures++;
-          const giveUp = failures >= 3;
-          idx.forEach((k) => { st[k] = giveUp ? 3 : 0; });
+          idx.forEach((k) => { st[k] = 0; });
           say(`字幕翻译失败：${err.message}`, { error: true, ms: 6000 });
-          if (!giveUp) setTimeout(pump, 2500 * failures);
+          // never give up for good, the network may come back mid-video: wait longer each time, up to 30 s
+          const wait = Math.min(2500 * failures, 30000);
+          retryAt = Date.now() + wait;
+          setTimeout(pump, wait + 50);
         })
         .finally(() => {
           if (myGen !== gen) return;
@@ -139,7 +142,7 @@
           shown = "";
           render();
           progress();
-          if (failures < 3) pump();
+          pump();
         });
     }
     progress();
@@ -149,7 +152,7 @@
     gen++;
     vid = newVid;
     sentences = []; zh = []; st = [];
-    inflight = 0; failures = 0; doneCount = 0; shown = "";
+    inflight = 0; failures = 0; doneCount = 0; shown = ""; retryAt = 0;
     if (overlay) { zhLine.textContent = ""; enLine.textContent = ""; overlay.classList.remove("on"); }
     applyStyle();
   }
@@ -188,7 +191,8 @@
   // media events don't bubble, but a capturing listener on the document still sees them
   let lastPump = 0;
   document.addEventListener("play", kick, true);
-  document.addEventListener("seeked", () => { shown = ""; render(); pump(); }, true);
+  // a seek or a changed setting is the viewer asking again: retry now instead of waiting out the pause
+  document.addEventListener("seeked", () => { shown = ""; retryAt = 0; render(); pump(); }, true);
   document.addEventListener("pause", render, true);
   document.addEventListener("timeupdate", () => {
     render();
@@ -210,6 +214,7 @@
       st = new Array(keep.length).fill(0);
     }
     shown = "";
+    retryAt = 0;
     render();
     pump();
   });

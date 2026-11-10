@@ -40,6 +40,7 @@
   const memo = new Map();       // source text -> translation, for this page's lifetime
   const waiting = new Map();    // source text -> elements waiting for it
   const inflight = new Set();   // source texts currently being translated
+  let failures = 0;             // requests failed in a row: sets the pause before the next retry
   const replaced = new Map();   // Text node -> original text, so "off" can restore the page exactly
   let handled = new WeakSet();
 
@@ -158,11 +159,18 @@
     try {
       const res = await R.translate(texts, { kind: "page" });
       if (mode !== myMode) return;
+      failures = 0;
       texts.forEach((t, i) => memo.set(t, res.translations[i]));
       for (const t of texts) for (const el of waiting.get(t) || []) if (el.isConnected) render(el);
       if (res.warning) status(res.warning, { error: true, ms: 6000 });
     } catch (e) {
       status(`翻译失败：${e.message}`, { error: true, ms: 6000 });
+      // hand the elements back to the viewport observer after a pause (longer each time, up to 30 s): whatever
+      // is still near the screen then is asked for again, so the page recovers once the network or engine does
+      const els = texts.flatMap((t) => waiting.get(t) || []);
+      setTimeout(() => {
+        if (mode === myMode) for (const el of els) if (el.isConnected) io.observe(el);
+      }, Math.min(3000 * ++failures, 30000));
     } finally {
       texts.forEach((t) => { inflight.delete(t); waiting.delete(t); });
       if (!document.querySelector("#htz-status.err.on")) showProgress();
